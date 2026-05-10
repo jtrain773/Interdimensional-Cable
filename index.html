@@ -47,11 +47,7 @@
   #screen-col { display: flex; flex-direction: column; border-right: 1px solid var(--border); }
   #screen-wrap { flex: 1; position: relative; background: #000; overflow: hidden; }
 
-  /* The actual player iframe — only inserted when user picks a channel */
-  #player-frame {
-    position: absolute; inset: 0; width: 100%; height: 100%;
-    border: none; display: none;
-  }
+  /* YT API injects its own iframe inside #yt-player-div */
 
   /* Thumbnail / idle state */
   #idle {
@@ -142,10 +138,12 @@
     .layout { grid-template-columns: 1fr; }
     #screen-col { border-right: none; border-bottom: 1px solid var(--border); }
     #screen-wrap { padding-bottom: 56.25%; height: 0; flex: none; }
-    #player-frame, #idle { position: absolute; }
+    #yt-player-div, #idle { position: absolute; }
     #right-col { max-height: 400px; }
   }
 </style>
+<!-- YouTube IFrame API — needed for onStateChange (auto-advance on end) -->
+<script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
 <!-- file:// warning banner — hidden when served over http/https -->
@@ -161,12 +159,7 @@
 <div class="layout">
   <div id="screen-col">
     <div id="screen-wrap">
-      <!-- player iframe: only gets src when user clicks play -->
-      <iframe id="player-frame"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-        allowfullscreen></iframe>
-
-      <!-- idle / thumbnail state -->
+      <!-- YT API player div injected here dynamically -->
       <div id="idle">
         <img id="thumb" alt="">
         <div id="static-art">▒▒▓▒▒▓▒▒▓▓▒▒▓▒▒▓<br>▓▒▒▓▒▒▒▒▒▒▓▓▒▒▒▒<br>▒▓▓▒▒▓▒▓▒▒▒▒▓▒▓▒<br>▒▒▓▒▒▓▒▒▓▓▒▒▓▒▒▓<br>▓▒▒▒▒▒▓▒▒▒▒▒▒▓▒▒</div>
@@ -275,6 +268,11 @@ function renderGuide() {
   ).join('');
 }
 
+// YouTube IFrame API
+let ytPlayer = null;
+
+function onYouTubeIframeAPIReady() {}
+
 function tune(idx) {
   const c = filtered[idx];
   if (!c) return;
@@ -285,28 +283,66 @@ function tune(idx) {
   const item = document.getElementById('gi' + idx);
   if (item) { item.classList.add('on'); item.scrollIntoView({ behavior:'smooth', block:'nearest' }); }
 
-  // hide idle screen immediately
+  // hide idle screen
   document.getElementById('idle').classList.add('hidden');
 
-  // tear down previous archive video if any
+  // tear down previous archive video
   const oldVid = document.getElementById('arch-vid');
   if (oldVid) oldVid.remove();
 
+  // tear down previous YT player
+  if (ytPlayer) {
+    try { ytPlayer.destroy(); } catch(e) {}
+    ytPlayer = null;
+  }
   const frame = document.getElementById('player-frame');
+  if (frame) { frame.style.display = 'none'; frame.src = 'about:blank'; }
 
   if (c.type === 'yt') {
-    // autoplay=1 works on HTTPS (GitHub Pages). Mute not needed since
-    // this fires from a user click which satisfies browser autoplay policy.
-    frame.style.display = 'block';
-    frame.src = `https://www.youtube.com/embed/${c.id}?autoplay=1&rel=0`;
+    // Always recreate the div fresh (YT API replaces it)
+    let ytDiv = document.getElementById('yt-player-div');
+    if (ytDiv) ytDiv.remove();
+    ytDiv = document.createElement('div');
+    ytDiv.id = 'yt-player-div';
+    ytDiv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;z-index:3;';
+    document.getElementById('screen-wrap').appendChild(ytDiv);
+
+    ytPlayer = new YT.Player('yt-player-div', {
+      videoId: c.id,
+      playerVars: {
+        autoplay: 1,
+        rel: 0,
+        modestbranding: 1,
+        loop: 1,
+        playlist: c.id  // loop=1 requires playlist set to same video ID
+      },
+      events: {
+        onReady: (e) => {
+          // Seek to a random point in the first 85% of the video
+          const dur = e.target.getDuration();
+          if (dur > 0) {
+            e.target.seekTo(Math.floor(Math.random() * dur * 0.85), true);
+          }
+        }
+      }
+    });
+
   } else {
-    frame.style.display = 'none';
+    // archive.org MP4 — loop natively, drop in at random point
     const vid = document.createElement('video');
     vid.id = 'arch-vid';
     vid.controls = true;
     vid.playsInline = true;
     vid.autoplay = true;
+    vid.loop = true;
     vid.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;background:#000;object-fit:contain;z-index:3;';
+
+    vid.addEventListener('loadedmetadata', () => {
+      if (vid.duration > 0) {
+        vid.currentTime = Math.random() * vid.duration * 0.85;
+      }
+    });
+
     document.getElementById('screen-wrap').appendChild(vid);
     vid.src = c.id;
     vid.load();
