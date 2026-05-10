@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interdimensional Cable</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080810;
+    --surface: #0f0f1a;
+    --surface2: #14141f;
+    --border: #1e1e30;
+    --border-hi: #2a2a4a;
+    --accent: #4488ff;
+    --accent-dim: #1a2a4a;
+    --text: #c8c8e0;
+    --text-dim: #5a5a7a;
+    --text-bright: #e8e8ff;
+    --glow: rgba(68,136,255,0.2);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    height: 100vh; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  body::after {
+    content: ''; position: fixed; inset: 0;
+    background: repeating-linear-gradient(0deg, rgba(0,0,30,0.05) 0px, rgba(0,0,30,0.05) 1px, transparent 1px, transparent 3px);
+    pointer-events: none; z-index: 9999;
+  }
+
+  header {
+    padding: 0.65rem 1.5rem; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 1rem; flex-shrink: 0;
+  }
+  h1 { font-family: 'Orbitron', monospace; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.2em; color: var(--accent); }
+  #sig { font-size: 10px; color: var(--text-dim); letter-spacing: 0.1em; }
+  #sdot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #3c3; margin-right: 5px; vertical-align: middle; animation: blink 2s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
+
+  .layout { flex: 1; display: grid; grid-template-columns: 1fr 285px; min-height: 0; }
+
+  /* ── SCREEN ── */
+  #screen-col { display: flex; flex-direction: column; border-right: 1px solid var(--border); }
+  #screen-wrap { flex: 1; position: relative; background: #000; overflow: hidden; }
+
+  /* The actual player iframe — only inserted when user picks a channel */
+  #player-frame {
+    position: absolute; inset: 0; width: 100%; height: 100%;
+    border: none; display: none;
+  }
+
+  /* Thumbnail / idle state */
+  #idle {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+    background: #000; z-index: 5;
+    transition: opacity 0.3s;
+  }
+  #idle.hidden { opacity: 0; pointer-events: none; }
+  #thumb {
+    width: 100%; height: 100%; object-fit: cover; opacity: 0.4;
+    position: absolute; inset: 0; display: none;
+  }
+  #play-btn {
+    position: relative; z-index: 2;
+    width: 72px; height: 72px; border-radius: 50%;
+    background: rgba(68,136,255,0.85); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.15s, background 0.15s;
+    box-shadow: 0 0 30px var(--glow);
+  }
+  #play-btn:hover { transform: scale(1.08); background: rgba(68,136,255,1); }
+  #play-btn svg { width: 28px; height: 28px; fill: #fff; margin-left: 4px; }
+  #idle-title {
+    position: relative; z-index: 2;
+    font-size: 13px; color: var(--text); text-align: center;
+    max-width: 80%; line-height: 1.5; letter-spacing: 0.03em;
+  }
+  #idle-sub { position: relative; z-index: 2; font-size: 11px; color: var(--text-dim); }
+  #static-art {
+    position: relative; z-index: 2;
+    font-size: 11px; line-height: 1.4; color: #181828;
+    letter-spacing: 1px; text-align: center; user-select: none;
+  }
+  #static-lbl { position: relative; z-index: 2; font-family: 'Orbitron', monospace; font-size: 9px; letter-spacing: 0.3em; color: #222238; }
+
+  #ch-bug {
+    position: absolute; top: 10px; right: 12px;
+    font-family: 'Orbitron', monospace; font-size: 11px;
+    color: rgba(255,255,255,0.65); letter-spacing: 0.12em;
+    z-index: 20; opacity: 0; transition: opacity 0.3s; pointer-events: none;
+    text-shadow: 0 0 10px rgba(68,136,255,0.9);
+  }
+  #ch-bug.show { opacity: 1; }
+
+  #now-bar {
+    background: var(--surface); border-top: 1px solid var(--border);
+    padding: 7px 14px; display: flex; align-items: center; gap: 10px;
+    min-height: 42px; flex-shrink: 0;
+  }
+  #now-ch { font-family: 'Orbitron', monospace; font-size: 10px; color: var(--accent); letter-spacing: 0.1em; white-space: nowrap; }
+  #now-title { font-size: 12px; color: var(--text-bright); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #now-flag { font-size: 14px; flex-shrink: 0; }
+  #ext-link { font-size: 10px; color: var(--text-dim); text-decoration: none; white-space: nowrap; border: 1px solid var(--border); padding: 2px 7px; border-radius: 2px; transition: color 0.12s, border-color 0.12s; flex-shrink: 0; display: none; }
+  #ext-link:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ── RIGHT ── */
+  #right-col { display: flex; flex-direction: column; overflow: hidden; }
+  #remote { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 12px; display: flex; flex-direction: column; gap: 7px; flex-shrink: 0; }
+  .rl { font-size: 9px; letter-spacing: 0.22em; color: var(--text-dim); text-transform: uppercase; }
+  .brow { display: flex; gap: 6px; }
+  .rb { flex: 1; background: var(--surface2); color: var(--text); border: 1px solid var(--border); padding: 7px 4px; cursor: pointer; font-family: 'Share Tech Mono', monospace; font-size: 12px; border-radius: 3px; transition: all 0.12s; text-align: center; }
+  .rb:hover { background: var(--border); color: var(--text-bright); border-color: var(--border-hi); }
+  .rb.flip { background: var(--accent-dim); color: var(--accent); border-color: #2a3a6a; font-family: 'Orbitron', monospace; font-size: 10px; letter-spacing: 0.1em; }
+  .rb.flip:hover { background: #1f2f5a; border-color: var(--accent); box-shadow: 0 0 14px var(--glow); }
+
+  #frow { display: flex; gap: 4px; padding: 7px 10px; border-bottom: 1px solid var(--border); flex-shrink: 0; flex-wrap: wrap; }
+  .fb { background: var(--surface2); color: var(--text-dim); border: 1px solid var(--border); padding: 3px 7px; cursor: pointer; font-family: 'Share Tech Mono', monospace; font-size: 10px; border-radius: 2px; transition: all 0.12s; white-space: nowrap; }
+  .fb:hover { background: var(--border); color: var(--text); }
+  .fb.on { background: var(--accent-dim); color: var(--accent); border-color: #2a3a6a; }
+
+  #guide { flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+  #guide::-webkit-scrollbar { width: 3px; }
+  #guide::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .ghdr { font-size: 9px; letter-spacing: 0.2em; color: var(--text-dim); padding: 7px 10px 5px; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+  .ci { display: flex; align-items: flex-start; gap: 8px; padding: 7px 10px; border-bottom: 1px solid rgba(255,255,255,0.025); cursor: pointer; transition: background 0.1s; }
+  .ci:hover { background: var(--surface); }
+  .ci.on { background: var(--accent-dim); }
+  .cn { font-family: 'Orbitron', monospace; font-size: 9px; color: var(--text-dim); min-width: 22px; padding-top: 2px; flex-shrink: 0; }
+  .ci.on .cn { color: var(--accent); }
+  .cinfo { flex: 1; min-width: 0; }
+  .cname { font-size: 11px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ci.on .cname { color: var(--text-bright); }
+  .cmeta { font-size: 10px; color: var(--text-dim); margin-top: 1px; }
+
+  @media (max-width: 660px) {
+    body { overflow: auto; height: auto; }
+    .layout { grid-template-columns: 1fr; }
+    #screen-col { border-right: none; border-bottom: 1px solid var(--border); }
+    #screen-wrap { padding-bottom: 56.25%; height: 0; flex: none; }
+    #player-frame, #idle { position: absolute; }
+    #right-col { max-height: 400px; }
+  }
+</style>
+</head>
+<body>
+<!-- file:// warning banner — hidden when served over http/https -->
+<div id="file-warn" style="display:none;background:#1a1000;border-bottom:1px solid #554400;padding:8px 16px;font-size:11px;color:#cc9900;letter-spacing:0.05em;line-height:1.6;">
+  ⚠ YouTube embeds require a web server. Open this file via <strong>http://</strong> not <strong>file://</strong>.<br>
+  Quick fix: <code style="background:#111;padding:1px 6px;border-radius:2px;">python -m http.server 8080</code> in this folder, then visit <a href="http://localhost:8080" style="color:#ffbb33;">http://localhost:8080</a> &nbsp;·&nbsp; Or deploy free to <a href="https://pages.github.com" target="_blank" style="color:#ffbb33;">GitHub Pages</a> — see README.md
+</div>
+
+<header>
+  <h1>Interdimensional Cable</h1>
+  <div id="sig"><span id="sdot"></span>WORLDWIDE BROADCAST</div>
+</header>
+<div class="layout">
+  <div id="screen-col">
+    <div id="screen-wrap">
+      <!-- player iframe: only gets src when user clicks play -->
+      <iframe id="player-frame"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+        allowfullscreen></iframe>
+
+      <!-- idle / thumbnail state -->
+      <div id="idle">
+        <img id="thumb" alt="">
+        <div id="static-art">▒▒▓▒▒▓▒▒▓▓▒▒▓▒▒▓<br>▓▒▒▓▒▒▒▒▒▒▓▓▒▒▒▒<br>▒▓▓▒▒▓▒▓▒▒▒▒▓▒▓▒<br>▒▒▓▒▒▓▒▒▓▓▒▒▓▒▒▓<br>▓▒▒▒▒▒▓▒▒▒▒▒▒▓▒▒</div>
+        <div id="static-lbl">NO SIGNAL — SELECT A CHANNEL</div>
+        <button id="play-btn" onclick="pressPlay()" style="display:none" aria-label="Play">
+          <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+        </button>
+        <div id="idle-title" style="display:none"></div>
+        <div id="idle-sub" style="display:none"></div>
+      </div>
+      <div id="ch-bug">CH <span id="ch-n">--</span></div>
+    </div>
+    <div id="now-bar">
+      <div id="now-ch">--</div>
+      <div id="now-title">No channel selected</div>
+      <div id="now-flag"></div>
+      <a id="ext-link" href="#" target="_blank">↗</a>
+    </div>
+  </div>
+
+  <div id="right-col">
+    <div id="remote">
+      <div class="rl">Remote</div>
+      <div class="brow"><button class="rb flip" onclick="flipRandom()">⚡ FLIP</button></div>
+      <div class="brow">
+        <button class="rb" onclick="go(-1)">◀ PREV</button>
+        <button class="rb" onclick="go(1)">NEXT ▶</button>
+      </div>
+    </div>
+    <div id="frow"></div>
+    <div id="guide">
+      <div class="ghdr">Channel Guide</div>
+      <div id="glist"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const channels = [
+  // 🇬🇧 UK — Mr Bean official channel (confirmed video IDs)
+  { n:1,  flag:"🇬🇧", country:"UK",         name:"Mr Bean — Attention Mr Bean!",          genre:"Comedy",      type:"yt", id:"ZJGAOmMdPz4" },
+  { n:2,  flag:"🇬🇧", country:"UK",         name:"Mr Bean — Back to School",              genre:"Comedy",      type:"yt", id:"Fw_B5WYwFA0" },
+  { n:3,  flag:"🇬🇧", country:"UK",         name:"Mr Bean — Meets the Queen",             genre:"Comedy",      type:"yt", id:"NoRv83zWIOQ" },
+  { n:4,  flag:"🇬🇧", country:"UK",         name:"Mr Bean — Goes Shopping",               genre:"Comedy",      type:"yt", id:"XYvfNgkDYic" },
+
+  // 🇩🇪 Germany — DW Documentary (confirmed video IDs)
+  { n:5,  flag:"🇩🇪", country:"Germany",    name:"DW — America in Election Year 2024",    genre:"Documentary", type:"yt", id:"GZHsihSVGHM" },
+  { n:6,  flag:"🇩🇪", country:"Germany",    name:"DW — World of the Superrich",           genre:"Documentary", type:"yt", id:"-4oB44W_2Tc" },
+  { n:7,  flag:"🇩🇪", country:"Germany",    name:"DW — Riches of East Germany's Party",  genre:"Documentary", type:"yt", id:"bOKqgJ8pdJE" },
+  { n:8,  flag:"🇩🇪", country:"Germany",    name:"DW — When Journalists Become Agents",  genre:"Documentary", type:"yt", id:"2w7_3o8bLyw" },
+  { n:9,  flag:"🇩🇪", country:"Germany",    name:"DW — Rise of Illiberal Europe",         genre:"Documentary", type:"yt", id:"Aerq2UDhZJQ" },
+
+  // 🇯🇵 Japan — NHK World (confirmed video IDs)
+  { n:10, flag:"🇯🇵", country:"Japan",      name:"NHK — Documentary 360",                genre:"Documentary", type:"yt", id:"RnBKHpfzwZg" },
+  { n:11, flag:"🇯🇵", country:"Japan",      name:"NHK — Thatched Living",                genre:"Documentary", type:"yt", id:"WL7FilB3sLM" },
+  { n:12, flag:"🇯🇵", country:"Japan",      name:"NHK — Stateless: Japanese in Philippines", genre:"Documentary", type:"yt", id:"uG4JJU5UdGk" },
+  { n:13, flag:"🇯🇵", country:"Japan",      name:"NHK — Game Planet",                    genre:"Documentary", type:"yt", id:"6joB4j6kemY" },
+  { n:14, flag:"🇯🇵", country:"Japan",      name:"NHK — Diary of a Nun's Kitchen",       genre:"Culture",     type:"yt", id:"VN_hmi9gBgA" },
+
+  // 🇶🇦 Al Jazeera (confirmed video IDs)
+  { n:15, flag:"🇶🇦", country:"Al Jazeera", name:"AJ — Echoes of a Lost Gaza",           genre:"Documentary", type:"yt", id:"BrrXmsrP03w" },
+  { n:16, flag:"🇶🇦", country:"Al Jazeera", name:"AJ — Live Stream",                     genre:"News",        type:"yt", id:"gCNeDWCI0vo" },
+
+  // 🇨🇳 China — CGTN Documentary (confirmed video IDs)
+  { n:17, flag:"🇨🇳", country:"China",      name:"CGTN — Unified Future",                genre:"Documentary", type:"yt", id:"q08uJRMh6MQ" },
+  { n:18, flag:"🇨🇳", country:"China",      name:"CGTN — China's Most Beautiful Village", genre:"Culture",    type:"yt", id:"iOhlm8UVzjQ" },
+  { n:19, flag:"🇨🇳", country:"China",      name:"CGTN — Echoes of Life",                genre:"Documentary", type:"yt", id:"8B9MMDOC1z0" },
+  { n:20, flag:"🇨🇳", country:"China",      name:"CGTN — Industrial Chains",             genre:"Documentary", type:"yt", id:"kTabY9Zk7GQ" },
+
+  // 🇺🇸 USA — archive.org public domain (direct MP4, confirmed)
+  { n:21, flag:"🇺🇸", country:"USA (PD)",   name:"Dragnet — The Big Cast (1952)",        genre:"Crime",       type:"mp4", id:"https://archive.org/download/Dragnet_TheBigCast/Dragnet_TheBigCast.mp4", page:"https://archive.org/details/Dragnet_TheBigCast" },
+  { n:22, flag:"🇺🇸", country:"USA (PD)",   name:"Robin Hood — The Coming (1955)",       genre:"Adventure",   type:"mp4", id:"https://archive.org/download/Robin_Hood_01_The_Coming_Of_Robin_Hood/Robin_Hood_01_The_Coming_Of_Robin_Hood.mp4", page:"https://archive.org/details/Robin_Hood_01_The_Coming_Of_Robin_Hood" },
+  { n:23, flag:"🇺🇸", country:"USA (PD)",   name:"Lone Ranger — Enter (1949)",           genre:"Western",     type:"mp4", id:"https://archive.org/download/enter_the_lone_ranger/enter_the_lone_ranger.mp4", page:"https://archive.org/details/enter_the_lone_ranger" },
+  { n:24, flag:"🇺🇸", country:"USA (PD)",   name:"Peter Gunn — The Fuse (1959)",         genre:"Detective",   type:"mp4", id:"https://archive.org/download/PeterGunn-TheFuse/PeterGunn-TheFuse.mp4", page:"https://archive.org/details/PeterGunn-TheFuse" },
+
+  // 🇫🇷🇯🇵 Classic anime — archive.org (direct MP4, confirmed)
+  { n:25, flag:"🇫🇷", country:"France/JP",  name:"Ulysses 31 — Restored",               genre:"Classic Anime", type:"mp4", id:"https://archive.org/download/ulysses-31_complete_restored_series/Ulysses%2031%20Restored%20-%2040th%20Anniversary%20Announcement.mp4", page:"https://archive.org/details/ulysses-31_complete_restored_series" },
+  { n:26, flag:"🇯🇵", country:"Japan",      name:"Astro Boy 1963 (English dub)",         genre:"Classic Anime", type:"mp4", id:"https://archive.org/download/astro-boy-1963/astro-boy-1963.mp4", page:"https://archive.org/details/astro-boy-1963" },
+  { n:27, flag:"🇯🇵", country:"Japan",      name:"Maya the Bee (1975 English)",          genre:"Classic Anime", type:"mp4", id:"https://archive.org/download/maya-the-bee-1975/Season%201%2FMaya%20the%20Bee%20-%20S01E01%20-%20Maya%20And%20The%20Ants.mp4", page:"https://archive.org/details/maya-the-bee-1975" },
+  { n:28, flag:"🇯🇵", country:"Japan",      name:"Speed Racer X — Ep 1",                genre:"Classic Anime", type:"mp4", id:"https://archive.org/download/speed-racer-x-1-13/Speed%20Racer%20X%20Episode%201%20Race%20To%20The%20Start.mp4", page:"https://archive.org/details/speed-racer-x-1-13" },
+];
+
+let cur = -1;
+let filtered = [...channels];
+let bugTimer = null;
+let pendingChannel = null;
+
+// ── Filters ──────────────────────────────────────────────────────────────────
+function buildFilters() {
+  const countries = ["All", ...new Set(channels.map(c => c.country))];
+  document.getElementById('frow').innerHTML = countries.map((c, i) => {
+    const flag = i === 0 ? '' : (channels.find(ch => ch.country === c)?.flag + ' ');
+    return `<button class="fb${i===0?' on':''}" onclick="setFilter('${c}',this)">${flag}${c}</button>`;
+  }).join('');
+}
+
+function setFilter(c, btn) {
+  document.querySelectorAll('.fb').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  filtered = c === 'All' ? [...channels] : channels.filter(ch => ch.country === c);
+  cur = -1;
+  renderGuide();
+}
+
+function renderGuide() {
+  document.getElementById('glist').innerHTML = filtered.map((c, i) =>
+    `<div class="ci" id="gi${i}" onclick="tune(${i})">
+      <div class="cn">${String(c.n).padStart(2,'0')}</div>
+      <div class="cinfo">
+        <div class="cname">${c.flag} ${c.name}</div>
+        <div class="cmeta">${c.country} · ${c.genre}</div>
+      </div>
+    </div>`
+  ).join('');
+}
+
+// ── Tune ─────────────────────────────────────────────────────────────────────
+function tune(idx) {
+  const c = filtered[idx];
+  if (!c) return;
+  cur = idx;
+  pendingChannel = c;
+
+  document.querySelectorAll('.ci').forEach(el => el.classList.remove('on'));
+  const item = document.getElementById('gi' + idx);
+  if (item) { item.classList.add('on'); item.scrollIntoView({ behavior:'smooth', block:'nearest' }); }
+
+  // stop current playback
+  const frame = document.getElementById('player-frame');
+  frame.src = 'about:blank';
+  frame.style.display = 'none';
+
+  // show idle with thumbnail (YouTube only) + play button
+  const idle = document.getElementById('idle');
+  idle.classList.remove('hidden');
+
+  const thumb = document.getElementById('thumb');
+  if (c.type === 'yt') {
+    thumb.src = `https://img.youtube.com/vi/${c.id}/hqdefault.jpg`;
+    thumb.style.display = 'block';
+  } else {
+    thumb.style.display = 'none';
+  }
+
+  document.getElementById('static-art').style.display = 'none';
+  document.getElementById('static-lbl').style.display = 'none';
+  document.getElementById('play-btn').style.display = 'flex';
+  document.getElementById('idle-title').textContent = c.name;
+  document.getElementById('idle-title').style.display = 'block';
+  document.getElementById('idle-sub').textContent = `${c.flag} ${c.country} · ${c.genre} — click to play`;
+  document.getElementById('idle-sub').style.display = 'block';
+
+  // channel bug
+  document.getElementById('ch-n').textContent = c.n;
+  const bug = document.getElementById('ch-bug');
+  bug.classList.add('show');
+  clearTimeout(bugTimer);
+  bugTimer = setTimeout(() => bug.classList.remove('show'), 3000);
+
+  // now bar
+  document.getElementById('now-ch').textContent = `CH ${String(c.n).padStart(2,'0')}`;
+  document.getElementById('now-title').textContent = c.name;
+  document.getElementById('now-flag').textContent = c.flag;
+
+  const link = document.getElementById('ext-link');
+  if (c.type === 'yt') {
+    link.href = `https://www.youtube.com/watch?v=${c.id}`;
+    link.textContent = '↗ YouTube';
+  } else {
+    link.href = c.page;
+    link.textContent = '↗ archive.org';
+  }
+  link.style.display = 'inline';
+}
+
+function pressPlay() {
+  const c = pendingChannel;
+  if (!c) return;
+
+  const idle = document.getElementById('idle');
+  const frame = document.getElementById('player-frame');
+
+  idle.classList.add('hidden');
+
+  if (c.type === 'yt') {
+    frame.style.display = 'block';
+    // autoplay=1&mute=0 — works after user gesture (the click on play btn counts)
+    frame.src = `https://www.youtube.com/embed/${c.id}?autoplay=1&rel=0`;
+  } else {
+    // archive.org — use a video element
+    frame.style.display = 'none';
+    let vid = document.getElementById('arch-vid');
+    if (vid) vid.remove();
+    vid = document.createElement('video');
+    vid.id = 'arch-vid';
+    vid.controls = true;
+    vid.playsInline = true;
+    vid.autoplay = true;
+    vid.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;background:#000;object-fit:contain;z-index:3;';
+    document.getElementById('screen-wrap').appendChild(vid);
+    vid.src = c.id;
+    vid.load();
+    vid.play().catch(() => {});
+  }
+}
+
+function flipRandom() {
+  if (!filtered.length) return;
+  let next;
+  do { next = Math.floor(Math.random() * filtered.length); } while (next === cur && filtered.length > 1);
+  tune(next);
+}
+
+function go(dir) {
+  if (!filtered.length) return;
+  if (cur < 0) { tune(0); return; }
+  tune((cur + dir + filtered.length) % filtered.length);
+}
+
+buildFilters();
+renderGuide();
+
+// Show warning banner when opened as file://
+if (location.protocol === 'file:') {
+  document.getElementById('file-warn').style.display = 'block';
+}
+</script>
+</body>
+</html>
