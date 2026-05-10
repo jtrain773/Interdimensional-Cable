@@ -206,55 +206,47 @@
 
 <script>
 const channels = [
-  // 🇬🇧 UK — Mr Bean official channel (confirmed video IDs)
-  { n:1,  flag:"🇬🇧", country:"UK",         name:"Mr Bean — Attention Mr Bean!",          genre:"Comedy",      type:"yt", id:"ZJGAOmMdPz4" },
-  { n:2,  flag:"🇬🇧", country:"UK",         name:"Mr Bean — Back to School",              genre:"Comedy",      type:"yt", id:"Fw_B5WYwFA0" },
-  { n:3,  flag:"🇬🇧", country:"UK",         name:"Mr Bean — Meets the Queen",             genre:"Comedy",      type:"yt", id:"NoRv83zWIOQ" },
-  { n:4,  flag:"🇬🇧", country:"UK",         name:"Mr Bean — Goes Shopping",               genre:"Comedy",      type:"yt", id:"XYvfNgkDYic" },
-
-  // 🇩🇪 Germany — DW Documentary (confirmed video IDs)
-  { n:5,  flag:"🇩🇪", country:"Germany",    name:"DW — America in Election Year 2024",    genre:"Documentary", type:"yt", id:"GZHsihSVGHM" },
-  { n:6,  flag:"🇩🇪", country:"Germany",    name:"DW — World of the Superrich",           genre:"Documentary", type:"yt", id:"-4oB44W_2Tc" },
-  { n:7,  flag:"🇩🇪", country:"Germany",    name:"DW — Riches of East Germany's Party",  genre:"Documentary", type:"yt", id:"bOKqgJ8pdJE" },
-  { n:8,  flag:"🇩🇪", country:"Germany",    name:"DW — When Journalists Become Agents",  genre:"Documentary", type:"yt", id:"2w7_3o8bLyw" },
-  { n:9,  flag:"🇩🇪", country:"Germany",    name:"DW — Rise of Illiberal Europe",         genre:"Documentary", type:"yt", id:"Aerq2UDhZJQ" },
-
-  // 🇯🇵 Japan — NHK World (confirmed video IDs)
-  { n:10, flag:"🇯🇵", country:"Japan",      name:"NHK — Documentary 360",                genre:"Documentary", type:"yt", id:"RnBKHpfzwZg" },
-  { n:11, flag:"🇯🇵", country:"Japan",      name:"NHK — Thatched Living",                genre:"Documentary", type:"yt", id:"WL7FilB3sLM" },
+  // 🇬🇧 UK — Mr Bean official channel
+  { n:1,  flag:"🇬🇧", country:"UK",         name:"Mr Bean — Attention Mr Bean!",           genre:"Comedy",        type:"yt",  id:"ZJGAOmMdPz4" },
+  { n:2,  flag:"🇬🇧", country:"UK",         name:"Mr Bean — Back to School",               genre:"Comedy",        type:"yt",  id:"Fw_B5WYwFA0" },
+  { n:3,  flag:"🇬🇧", country:"UK",         name:"Mr Bean — Meets the Queen",              genre:"Comedy",        type:"yt",  id:"NoRv83zWIOQ" },
+  { n:4,  flag:"🇬🇧", country:"UK",         name:"Mr Bean — Goes Shopping",                genre:"Comedy",        type:"yt",  id:"XYvfNgkDYic" },
+  // 🇩🇪 Germany — DW Documentary
+  { n:5,  flag:"🇩🇪", country:"Germany",    name:"DW — America in Election Year 2024",     genre:"Documentary",   type:"yt",  id:"GZHsihSVGHM" },
+  { n:6,  flag:"🇩🇪", country:"Germany",    name:"DW — World of the Superrich",            genre:"Documentary",   type:"yt",  id:"-4oB44W_2Tc" },
+  { n:7,  flag:"🇩🇪", country:"Germany",    name:"DW — Riches of East Germany's Party",   genre:"Documentary",   type:"yt",  id:"bOKqgJ8pdJE" },
+  { n:8,  flag:"🇩🇪", country:"Germany",    name:"DW — When Journalists Become Agents",   genre:"Documentary",   type:"yt",  id:"2w7_3o8bLyw" },
+  { n:9,  flag:"🇩🇪", country:"Germany",    name:"DW — Rise of Illiberal Europe",          genre:"Documentary",   type:"yt",  id:"Aerq2UDhZJQ" },
+  // 🇯🇵 Japan — NHK World
+  { n:10, flag:"🇯🇵", country:"Japan",      name:"NHK — Documentary 360",                 genre:"Documentary",   type:"yt",  id:"RnBKHpfzwZg" },
+  { n:11, flag:"🇯🇵", country:"Japan",      name:"NHK — Thatched Living",                 genre:"Documentary",   type:"yt",  id:"WL7FilB3sLM" },
   { n:12, flag:"🇯🇵", country:"Japan",      name:"NHK — Stateless: Japanese in Philippines", genre:"Documentary", type:"yt", id:"uG4JJU5UdGk" },
-  { n:13, flag:"🇯🇵", country:"Japan",      name:"NHK — Game Planet",                    genre:"Documentary", type:"yt", id:"6joB4j6kemY" },
-  { n:14, flag:"🇯🇵", country:"Japan",      name:"NHK — Diary of a Nun's Kitchen",       genre:"Culture",     type:"yt", id:"VN_hmi9gBgA" },
-
-  // 🇶🇦 Al Jazeera (confirmed video IDs)
-  { n:15, flag:"🇶🇦", country:"Al Jazeera", name:"AJ — Echoes of a Lost Gaza",           genre:"Documentary", type:"yt", id:"BrrXmsrP03w" },
-  { n:16, flag:"🇶🇦", country:"Al Jazeera", name:"AJ — Live Stream",                     genre:"News",        type:"yt", id:"gCNeDWCI0vo" },
-
-  // 🇨🇳 China — CGTN Documentary (confirmed video IDs)
-  { n:17, flag:"🇨🇳", country:"China",      name:"CGTN — Unified Future",                genre:"Documentary", type:"yt", id:"q08uJRMh6MQ" },
-  { n:18, flag:"🇨🇳", country:"China",      name:"CGTN — China's Most Beautiful Village", genre:"Culture",    type:"yt", id:"iOhlm8UVzjQ" },
-  { n:19, flag:"🇨🇳", country:"China",      name:"CGTN — Echoes of Life",                genre:"Documentary", type:"yt", id:"8B9MMDOC1z0" },
-  { n:20, flag:"🇨🇳", country:"China",      name:"CGTN — Industrial Chains",             genre:"Documentary", type:"yt", id:"kTabY9Zk7GQ" },
-
-  // 🇺🇸 USA — archive.org public domain (direct MP4, confirmed)
-  { n:21, flag:"🇺🇸", country:"USA (PD)",   name:"Dragnet — The Big Cast (1952)",        genre:"Crime",       type:"mp4", id:"https://archive.org/download/Dragnet_TheBigCast/Dragnet_TheBigCast.mp4", page:"https://archive.org/details/Dragnet_TheBigCast" },
-  { n:22, flag:"🇺🇸", country:"USA (PD)",   name:"Robin Hood — The Coming (1955)",       genre:"Adventure",   type:"mp4", id:"https://archive.org/download/Robin_Hood_01_The_Coming_Of_Robin_Hood/Robin_Hood_01_The_Coming_Of_Robin_Hood.mp4", page:"https://archive.org/details/Robin_Hood_01_The_Coming_Of_Robin_Hood" },
-  { n:23, flag:"🇺🇸", country:"USA (PD)",   name:"Lone Ranger — Enter (1949)",           genre:"Western",     type:"mp4", id:"https://archive.org/download/enter_the_lone_ranger/enter_the_lone_ranger.mp4", page:"https://archive.org/details/enter_the_lone_ranger" },
-  { n:24, flag:"🇺🇸", country:"USA (PD)",   name:"Peter Gunn — The Fuse (1959)",         genre:"Detective",   type:"mp4", id:"https://archive.org/download/PeterGunn-TheFuse/PeterGunn-TheFuse.mp4", page:"https://archive.org/details/PeterGunn-TheFuse" },
-
-  // 🇫🇷🇯🇵 Classic anime — archive.org (direct MP4, confirmed)
-  { n:25, flag:"🇫🇷", country:"France/JP",  name:"Ulysses 31 — Restored",               genre:"Classic Anime", type:"mp4", id:"https://archive.org/download/ulysses-31_complete_restored_series/Ulysses%2031%20Restored%20-%2040th%20Anniversary%20Announcement.mp4", page:"https://archive.org/details/ulysses-31_complete_restored_series" },
-  { n:26, flag:"🇯🇵", country:"Japan",      name:"Astro Boy 1963 (English dub)",         genre:"Classic Anime", type:"mp4", id:"https://archive.org/download/astro-boy-1963/astro-boy-1963.mp4", page:"https://archive.org/details/astro-boy-1963" },
-  { n:27, flag:"🇯🇵", country:"Japan",      name:"Maya the Bee (1975 English)",          genre:"Classic Anime", type:"mp4", id:"https://archive.org/download/maya-the-bee-1975/Season%201%2FMaya%20the%20Bee%20-%20S01E01%20-%20Maya%20And%20The%20Ants.mp4", page:"https://archive.org/details/maya-the-bee-1975" },
-  { n:28, flag:"🇯🇵", country:"Japan",      name:"Speed Racer X — Ep 1",                genre:"Classic Anime", type:"mp4", id:"https://archive.org/download/speed-racer-x-1-13/Speed%20Racer%20X%20Episode%201%20Race%20To%20The%20Start.mp4", page:"https://archive.org/details/speed-racer-x-1-13" },
+  { n:13, flag:"🇯🇵", country:"Japan",      name:"NHK — Game Planet",                     genre:"Documentary",   type:"yt",  id:"6joB4j6kemY" },
+  { n:14, flag:"🇯🇵", country:"Japan",      name:"NHK — Diary of a Nun's Kitchen",        genre:"Culture",       type:"yt",  id:"VN_hmi9gBgA" },
+  // 🇶🇦 Al Jazeera
+  { n:15, flag:"🇶🇦", country:"Al Jazeera", name:"AJ — Echoes of a Lost Gaza",            genre:"Documentary",   type:"yt",  id:"BrrXmsrP03w" },
+  { n:16, flag:"🇶🇦", country:"Al Jazeera", name:"AJ — Live Stream",                      genre:"News",          type:"yt",  id:"gCNeDWCI0vo" },
+  // 🇨🇳 China — CGTN Documentary
+  { n:17, flag:"🇨🇳", country:"China",      name:"CGTN — Unified Future",                 genre:"Documentary",   type:"yt",  id:"q08uJRMh6MQ" },
+  { n:18, flag:"🇨🇳", country:"China",      name:"CGTN — China's Most Beautiful Village",  genre:"Culture",       type:"yt",  id:"iOhlm8UVzjQ" },
+  { n:19, flag:"🇨🇳", country:"China",      name:"CGTN — Echoes of Life",                 genre:"Documentary",   type:"yt",  id:"8B9MMDOC1z0" },
+  { n:20, flag:"🇨🇳", country:"China",      name:"CGTN — Industrial Chains",              genre:"Documentary",   type:"yt",  id:"kTabY9Zk7GQ" },
+  // 🇺🇸 USA — archive.org public domain MP4
+  { n:21, flag:"🇺🇸", country:"USA (PD)",   name:"Dragnet — The Big Cast (1952)",         genre:"Crime",         type:"mp4", id:"https://archive.org/download/Dragnet_TheBigCast/Dragnet_TheBigCast.mp4",                                                                                                                         page:"https://archive.org/details/Dragnet_TheBigCast" },
+  { n:22, flag:"🇺🇸", country:"USA (PD)",   name:"Robin Hood — The Coming (1955)",        genre:"Adventure",     type:"mp4", id:"https://archive.org/download/Robin_Hood_01_The_Coming_Of_Robin_Hood/Robin_Hood_01_The_Coming_Of_Robin_Hood.mp4",                                                                                page:"https://archive.org/details/Robin_Hood_01_The_Coming_Of_Robin_Hood" },
+  { n:23, flag:"🇺🇸", country:"USA (PD)",   name:"Lone Ranger — Enter (1949)",            genre:"Western",       type:"mp4", id:"https://archive.org/download/enter_the_lone_ranger/enter_the_lone_ranger.mp4",                                                                                                                  page:"https://archive.org/details/enter_the_lone_ranger" },
+  { n:24, flag:"🇺🇸", country:"USA (PD)",   name:"Peter Gunn — The Fuse (1959)",          genre:"Detective",     type:"mp4", id:"https://archive.org/download/PeterGunn-TheFuse/PeterGunn-TheFuse.mp4",                                                                                                                          page:"https://archive.org/details/PeterGunn-TheFuse" },
+  // 🇫🇷🇯🇵 Classic anime — archive.org MP4
+  { n:25, flag:"🇫🇷", country:"France/JP",  name:"Ulysses 31 — Restored",                genre:"Classic Anime", type:"mp4", id:"https://archive.org/download/ulysses-31_complete_restored_series/Ulysses%2031%20Restored%20-%2040th%20Anniversary%20Announcement.mp4",                                                          page:"https://archive.org/details/ulysses-31_complete_restored_series" },
+  { n:26, flag:"🇯🇵", country:"Japan",      name:"Astro Boy 1963 (English dub)",          genre:"Classic Anime", type:"mp4", id:"https://archive.org/download/astro-boy-1963/astro-boy-1963.mp4",                                                                                                                                page:"https://archive.org/details/astro-boy-1963" },
+  { n:27, flag:"🇯🇵", country:"Japan",      name:"Maya the Bee (1975 English)",           genre:"Classic Anime", type:"mp4", id:"https://archive.org/download/maya-the-bee-1975/Season%201%2FMaya%20the%20Bee%20-%20S01E01%20-%20Maya%20And%20The%20Ants.mp4",                                                                  page:"https://archive.org/details/maya-the-bee-1975" },
+  { n:28, flag:"🇯🇵", country:"Japan",      name:"Speed Racer X — Ep 1",                 genre:"Classic Anime", type:"mp4", id:"https://archive.org/download/speed-racer-x-1-13/Speed%20Racer%20X%20Episode%201%20Race%20To%20The%20Start.mp4",                                                                                page:"https://archive.org/details/speed-racer-x-1-13" },
 ];
 
 let cur = -1;
 let filtered = [...channels];
 let bugTimer = null;
-let pendingChannel = null;
 
-// ── Filters ──────────────────────────────────────────────────────────────────
 function buildFilters() {
   const countries = ["All", ...new Set(channels.map(c => c.country))];
   document.getElementById('frow').innerHTML = countries.map((c, i) => {
@@ -283,84 +275,33 @@ function renderGuide() {
   ).join('');
 }
 
-// ── Tune ─────────────────────────────────────────────────────────────────────
 function tune(idx) {
   const c = filtered[idx];
   if (!c) return;
   cur = idx;
-  pendingChannel = c;
 
+  // highlight guide item
   document.querySelectorAll('.ci').forEach(el => el.classList.remove('on'));
   const item = document.getElementById('gi' + idx);
   if (item) { item.classList.add('on'); item.scrollIntoView({ behavior:'smooth', block:'nearest' }); }
 
-  // stop current playback
-  const frame = document.getElementById('player-frame');
-  frame.src = 'about:blank';
-  frame.style.display = 'none';
+  // hide idle screen immediately
+  document.getElementById('idle').classList.add('hidden');
 
-  // show idle with thumbnail (YouTube only) + play button
-  const idle = document.getElementById('idle');
-  idle.classList.remove('hidden');
+  // tear down previous archive video if any
+  const oldVid = document.getElementById('arch-vid');
+  if (oldVid) oldVid.remove();
 
-  const thumb = document.getElementById('thumb');
-  if (c.type === 'yt') {
-    thumb.src = `https://img.youtube.com/vi/${c.id}/hqdefault.jpg`;
-    thumb.style.display = 'block';
-  } else {
-    thumb.style.display = 'none';
-  }
-
-  document.getElementById('static-art').style.display = 'none';
-  document.getElementById('static-lbl').style.display = 'none';
-  document.getElementById('play-btn').style.display = 'flex';
-  document.getElementById('idle-title').textContent = c.name;
-  document.getElementById('idle-title').style.display = 'block';
-  document.getElementById('idle-sub').textContent = `${c.flag} ${c.country} · ${c.genre} — click to play`;
-  document.getElementById('idle-sub').style.display = 'block';
-
-  // channel bug
-  document.getElementById('ch-n').textContent = c.n;
-  const bug = document.getElementById('ch-bug');
-  bug.classList.add('show');
-  clearTimeout(bugTimer);
-  bugTimer = setTimeout(() => bug.classList.remove('show'), 3000);
-
-  // now bar
-  document.getElementById('now-ch').textContent = `CH ${String(c.n).padStart(2,'0')}`;
-  document.getElementById('now-title').textContent = c.name;
-  document.getElementById('now-flag').textContent = c.flag;
-
-  const link = document.getElementById('ext-link');
-  if (c.type === 'yt') {
-    link.href = `https://www.youtube.com/watch?v=${c.id}`;
-    link.textContent = '↗ YouTube';
-  } else {
-    link.href = c.page;
-    link.textContent = '↗ archive.org';
-  }
-  link.style.display = 'inline';
-}
-
-function pressPlay() {
-  const c = pendingChannel;
-  if (!c) return;
-
-  const idle = document.getElementById('idle');
   const frame = document.getElementById('player-frame');
 
-  idle.classList.add('hidden');
-
   if (c.type === 'yt') {
+    // autoplay=1 works on HTTPS (GitHub Pages). Mute not needed since
+    // this fires from a user click which satisfies browser autoplay policy.
     frame.style.display = 'block';
-    // autoplay=1&mute=0 — works after user gesture (the click on play btn counts)
     frame.src = `https://www.youtube.com/embed/${c.id}?autoplay=1&rel=0`;
   } else {
-    // archive.org — use a video element
     frame.style.display = 'none';
-    let vid = document.getElementById('arch-vid');
-    if (vid) vid.remove();
-    vid = document.createElement('video');
+    const vid = document.createElement('video');
     vid.id = 'arch-vid';
     vid.controls = true;
     vid.playsInline = true;
@@ -371,6 +312,22 @@ function pressPlay() {
     vid.load();
     vid.play().catch(() => {});
   }
+
+  // channel bug overlay
+  document.getElementById('ch-n').textContent = c.n;
+  const bug = document.getElementById('ch-bug');
+  bug.classList.add('show');
+  clearTimeout(bugTimer);
+  bugTimer = setTimeout(() => bug.classList.remove('show'), 3000);
+
+  // now bar
+  document.getElementById('now-ch').textContent = `CH ${String(c.n).padStart(2,'0')}`;
+  document.getElementById('now-title').textContent = c.name;
+  document.getElementById('now-flag').textContent = c.flag;
+  const link = document.getElementById('ext-link');
+  link.href = c.type === 'yt' ? `https://www.youtube.com/watch?v=${c.id}` : c.page;
+  link.textContent = c.type === 'yt' ? '↗ YouTube' : '↗ archive.org';
+  link.style.display = 'inline';
 }
 
 function flipRandom() {
@@ -389,7 +346,6 @@ function go(dir) {
 buildFilters();
 renderGuide();
 
-// Show warning banner when opened as file://
 if (location.protocol === 'file:') {
   document.getElementById('file-warn').style.display = 'block';
 }
