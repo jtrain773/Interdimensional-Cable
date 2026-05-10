@@ -2,7 +2,7 @@
 
 A channel-flipping experience pulling free international TV from around the world — documentaries, classic anime, old comedies, news, and more.
 
-**[▶ Live Demo →](https://YOUR-USERNAME.github.io/interdimensional-cable)**
+**[▶ Live Demo →](https://jtrain773.github.io/interdimensional-cable)**
 
 ---
 
@@ -25,7 +25,7 @@ git init
 git add .
 git commit -m "launch"
 git branch -M main
-git remote add origin https://github.com/YOUR-USERNAME/interdimensional-cable.git
+git remote add origin https://github.com/jtrain773/interdimensional-cable.git
 git push -u origin main
 ```
 
