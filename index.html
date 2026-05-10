@@ -199,41 +199,78 @@
 
 <script>
 const channels = [
-  // 🇬🇧 UK — Mr Bean official channel
-  { n:1,  flag:"🇬🇧", country:"UK",         name:"Mr Bean — Attention Mr Bean!",           genre:"Comedy",        type:"yt",  id:"ZJGAOmMdPz4" },
-  { n:2,  flag:"🇬🇧", country:"UK",         name:"Mr Bean — Back to School",               genre:"Comedy",        type:"yt",  id:"Fw_B5WYwFA0" },
-  { n:3,  flag:"🇬🇧", country:"UK",         name:"Mr Bean — Meets the Queen",              genre:"Comedy",        type:"yt",  id:"NoRv83zWIOQ" },
-  { n:4,  flag:"🇬🇧", country:"UK",         name:"Mr Bean — Goes Shopping",                genre:"Comedy",        type:"yt",  id:"XYvfNgkDYic" },
-  // 🇩🇪 Germany — DW Documentary
-  { n:5,  flag:"🇩🇪", country:"Germany",    name:"DW — America in Election Year 2024",     genre:"Documentary",   type:"yt",  id:"GZHsihSVGHM" },
-  { n:6,  flag:"🇩🇪", country:"Germany",    name:"DW — World of the Superrich",            genre:"Documentary",   type:"yt",  id:"-4oB44W_2Tc" },
-  { n:7,  flag:"🇩🇪", country:"Germany",    name:"DW — Riches of East Germany's Party",   genre:"Documentary",   type:"yt",  id:"bOKqgJ8pdJE" },
-  { n:8,  flag:"🇩🇪", country:"Germany",    name:"DW — When Journalists Become Agents",   genre:"Documentary",   type:"yt",  id:"2w7_3o8bLyw" },
-  { n:9,  flag:"🇩🇪", country:"Germany",    name:"DW — Rise of Illiberal Europe",          genre:"Documentary",   type:"yt",  id:"Aerq2UDhZJQ" },
-  // 🇯🇵 Japan — NHK World
-  { n:10, flag:"🇯🇵", country:"Japan",      name:"NHK — Documentary 360",                 genre:"Documentary",   type:"yt",  id:"RnBKHpfzwZg" },
-  { n:11, flag:"🇯🇵", country:"Japan",      name:"NHK — Thatched Living",                 genre:"Documentary",   type:"yt",  id:"WL7FilB3sLM" },
-  { n:12, flag:"🇯🇵", country:"Japan",      name:"NHK — Stateless: Japanese in Philippines", genre:"Documentary", type:"yt", id:"uG4JJU5UdGk" },
-  { n:13, flag:"🇯🇵", country:"Japan",      name:"NHK — Game Planet",                     genre:"Documentary",   type:"yt",  id:"6joB4j6kemY" },
-  { n:14, flag:"🇯🇵", country:"Japan",      name:"NHK — Diary of a Nun's Kitchen",        genre:"Culture",       type:"yt",  id:"VN_hmi9gBgA" },
-  // 🇶🇦 Al Jazeera
-  { n:15, flag:"🇶🇦", country:"Al Jazeera", name:"AJ — Echoes of a Lost Gaza",            genre:"Documentary",   type:"yt",  id:"BrrXmsrP03w" },
-  { n:16, flag:"🇶🇦", country:"Al Jazeera", name:"AJ — Live Stream",                      genre:"News",          type:"yt",  id:"gCNeDWCI0vo" },
-  // 🇨🇳 China — CGTN Documentary
-  { n:17, flag:"🇨🇳", country:"China",      name:"CGTN — Unified Future",                 genre:"Documentary",   type:"yt",  id:"q08uJRMh6MQ" },
-  { n:18, flag:"🇨🇳", country:"China",      name:"CGTN — China's Most Beautiful Village",  genre:"Culture",       type:"yt",  id:"iOhlm8UVzjQ" },
-  { n:19, flag:"🇨🇳", country:"China",      name:"CGTN — Echoes of Life",                 genre:"Documentary",   type:"yt",  id:"8B9MMDOC1z0" },
-  { n:20, flag:"🇨🇳", country:"China",      name:"CGTN — Industrial Chains",              genre:"Documentary",   type:"yt",  id:"kTabY9Zk7GQ" },
-  // 🇺🇸 USA — archive.org public domain MP4
-  { n:21, flag:"🇺🇸", country:"USA (PD)",   name:"Dragnet — The Big Cast (1952)",         genre:"Crime",         type:"mp4", id:"https://archive.org/download/Dragnet_TheBigCast/Dragnet_TheBigCast.mp4",                                                                                                                         page:"https://archive.org/details/Dragnet_TheBigCast" },
-  { n:22, flag:"🇺🇸", country:"USA (PD)",   name:"Robin Hood — The Coming (1955)",        genre:"Adventure",     type:"mp4", id:"https://archive.org/download/Robin_Hood_01_The_Coming_Of_Robin_Hood/Robin_Hood_01_The_Coming_Of_Robin_Hood.mp4",                                                                                page:"https://archive.org/details/Robin_Hood_01_The_Coming_Of_Robin_Hood" },
-  { n:23, flag:"🇺🇸", country:"USA (PD)",   name:"Lone Ranger — Enter (1949)",            genre:"Western",       type:"mp4", id:"https://archive.org/download/enter_the_lone_ranger/enter_the_lone_ranger.mp4",                                                                                                                  page:"https://archive.org/details/enter_the_lone_ranger" },
-  { n:24, flag:"🇺🇸", country:"USA (PD)",   name:"Peter Gunn — The Fuse (1959)",          genre:"Detective",     type:"mp4", id:"https://archive.org/download/PeterGunn-TheFuse/PeterGunn-TheFuse.mp4",                                                                                                                          page:"https://archive.org/details/PeterGunn-TheFuse" },
-  // 🇫🇷🇯🇵 Classic anime — archive.org MP4
-  { n:25, flag:"🇫🇷", country:"France/JP",  name:"Ulysses 31 — Restored",                genre:"Classic Anime", type:"mp4", id:"https://archive.org/download/ulysses-31_complete_restored_series/Ulysses%2031%20Restored%20-%2040th%20Anniversary%20Announcement.mp4",                                                          page:"https://archive.org/details/ulysses-31_complete_restored_series" },
-  { n:26, flag:"🇯🇵", country:"Japan",      name:"Astro Boy 1963 (English dub)",          genre:"Classic Anime", type:"mp4", id:"https://archive.org/download/astro-boy-1963/astro-boy-1963.mp4",                                                                                                                                page:"https://archive.org/details/astro-boy-1963" },
-  { n:27, flag:"🇯🇵", country:"Japan",      name:"Maya the Bee (1975 English)",           genre:"Classic Anime", type:"mp4", id:"https://archive.org/download/maya-the-bee-1975/Season%201%2FMaya%20the%20Bee%20-%20S01E01%20-%20Maya%20And%20The%20Ants.mp4",                                                                  page:"https://archive.org/details/maya-the-bee-1975" },
-  { n:28, flag:"🇯🇵", country:"Japan",      name:"Speed Racer X — Ep 1",                 genre:"Classic Anime", type:"mp4", id:"https://archive.org/download/speed-racer-x-1-13/Speed%20Racer%20X%20Episode%201%20Race%20To%20The%20Start.mp4",                                                                                page:"https://archive.org/details/speed-racer-x-1-13" },
+
+  // ── 🇬🇧 BBC Earth — David Attenborough wildlife (official YouTube, confirmed)
+  { n:1,  flag:"🇬🇧", country:"BBC Earth",   name:"BBC Earth — Wild Side of Our Planet",          genre:"Wildlife",      type:"yt", id:"E5fofNAbm78" },
+  { n:2,  flag:"🇬🇧", country:"BBC Earth",   name:"BBC Earth — 2hrs Captivating Nature",          genre:"Wildlife",      type:"yt", id:"ZMnEWJARaUg" },
+  { n:3,  flag:"🇬🇧", country:"BBC Earth",   name:"BBC Earth — Breathtaking Moments",             genre:"Wildlife",      type:"yt", id:"jdZSMhBa4UM" },
+  { n:4,  flag:"🇬🇧", country:"BBC Earth",   name:"BBC Earth — 5hrs 4K Nature",                  genre:"Wildlife",      type:"yt", id:"No45YnGEwPI" },
+  { n:5,  flag:"🇬🇧", country:"BBC Earth",   name:"BBC Earth — Extraordinary Moments",            genre:"Wildlife",      type:"yt", id:"-E8XfkSAS8A" },
+
+  // ── 🇬🇧 Mr Bean — official comedy (confirmed)
+  { n:6,  flag:"🇬🇧", country:"UK",          name:"Mr Bean — Attention!",                         genre:"Comedy",        type:"yt", id:"ZJGAOmMdPz4" },
+  { n:7,  flag:"🇬🇧", country:"UK",          name:"Mr Bean — Back to School",                     genre:"Comedy",        type:"yt", id:"Fw_B5WYwFA0" },
+  { n:8,  flag:"🇬🇧", country:"UK",          name:"Mr Bean — Meets the Queen",                    genre:"Comedy",        type:"yt", id:"NoRv83zWIOQ" },
+
+  // ── 🇩🇪 DW Documentary (confirmed)
+  { n:9,  flag:"🇩🇪", country:"Germany",     name:"DW — Election Year America 2024",              genre:"Documentary",   type:"yt", id:"GZHsihSVGHM" },
+  { n:10, flag:"🇩🇪", country:"Germany",     name:"DW — World of the Superrich",                  genre:"Documentary",   type:"yt", id:"-4oB44W_2Tc" },
+  { n:11, flag:"🇩🇪", country:"Germany",     name:"DW — Swiss Mountain Communities",              genre:"Documentary",   type:"yt", id:"FwBZPhJrNec" },
+  { n:12, flag:"🇩🇪", country:"Germany",     name:"DW — By Train Through Thailand",               genre:"Travel",        type:"yt", id:"aaPt1LWGIB0" },
+  { n:13, flag:"🇩🇪", country:"Germany",     name:"DW — Secrets of Lightning",                    genre:"Science",       type:"yt", id:"1I9u5x4N6ME" },
+  { n:14, flag:"🇩🇪", country:"Germany",     name:"DW — Norway Flooded by Tourists",              genre:"Documentary",   type:"yt", id:"bsIUHHtEEOc" },
+  { n:15, flag:"🇩🇪", country:"Germany",     name:"DW — Albania's Mysterious North",              genre:"Travel",        type:"yt", id:"Ma85-ZxGL3U" },
+  { n:16, flag:"🇩🇪", country:"Germany",     name:"DW — Rise of Illiberal Europe",                genre:"Documentary",   type:"yt", id:"Aerq2UDhZJQ" },
+
+  // ── 🇯🇵 NHK World — Japan (confirmed)
+  { n:17, flag:"🇯🇵", country:"Japan",       name:"NHK — Fukushima Decommission 2024",            genre:"Documentary",   type:"yt", id:"M82bUV-RnSI" },
+  { n:18, flag:"🇯🇵", country:"Japan",       name:"NHK — Thatched Living",                        genre:"Documentary",   type:"yt", id:"WL7FilB3sLM" },
+  { n:19, flag:"🇯🇵", country:"Japan",       name:"NHK — Stateless: Japanese in Philippines",     genre:"Documentary",   type:"yt", id:"uG4JJU5UdGk" },
+  { n:20, flag:"🇯🇵", country:"Japan",       name:"NHK — Herbal Symphony",                        genre:"Culture",       type:"yt", id:"Qv2-IjYls0A" },
+  { n:21, flag:"🇯🇵", country:"Japan",       name:"NHK — Missing: Lost with Dementia",            genre:"Documentary",   type:"yt", id:"b0eBHFENGmM" },
+  { n:22, flag:"🇯🇵", country:"Japan",       name:"NHK — Journeys: Okinawa in Bloom",             genre:"Travel",        type:"yt", id:"B1P3XsXdYLQ" },
+  { n:23, flag:"🇯🇵", country:"Japan",       name:"NHK — Journeys: Yakushima Awakenings",         genre:"Travel",        type:"yt", id:"Qo7X9ATqa64" },
+  { n:24, flag:"🇯🇵", country:"Japan",       name:"NHK — Journeys: Wakayama Flavors",             genre:"Travel",        type:"yt", id:"VaGvz1FjcpU" },
+  { n:25, flag:"🇯🇵", country:"Japan",       name:"NHK — Journeys: Kumano Kodo Hiking",           genre:"Travel",        type:"yt", id:"-h8G_6ZY7Oc" },
+  { n:26, flag:"🇯🇵", country:"Japan",       name:"NHK — Diary of a Nun's Kitchen",               genre:"Culture",       type:"yt", id:"VN_hmi9gBgA" },
+
+  // ── 🇫🇷🇩🇪 ARTE.tv — European cultural channel (confirmed)
+  { n:27, flag:"🇫🇷", country:"ARTE",        name:"ARTE — Nice to Meet You: France",              genre:"Documentary",   type:"yt", id:"TKuAWJ7izu8" },
+  { n:28, flag:"🇫🇷", country:"ARTE",        name:"ARTE — Portugal: Small Country Big History",   genre:"History",       type:"yt", id:"VrNlZh_fxgA" },
+  { n:29, flag:"🇫🇷", country:"ARTE",        name:"ARTE — Putin: Feared, Hated, Admired?",        genre:"Documentary",   type:"yt", id:"NqB1xwhJHyw" },
+  { n:30, flag:"🇫🇷", country:"ARTE",        name:"ARTE — The Origin of Life",                    genre:"Science",       type:"yt", id:"DCAXlQQZXWs" },
+  { n:31, flag:"🇫🇷", country:"ARTE",        name:"ARTE — Ukraine: A Battle for History",         genre:"History",       type:"yt", id:"JN5puNjI_jE" },
+  { n:32, flag:"🇫🇷", country:"ARTE",        name:"ARTE — Do We Need Corruption?",                genre:"Society",       type:"yt", id:"aY6b2sQBRBA" },
+
+  // ── 🇶🇦 Al Jazeera (confirmed)
+  { n:33, flag:"🇶🇦", country:"Al Jazeera",  name:"AJ — Echoes of a Lost Gaza",                  genre:"Documentary",   type:"yt", id:"BrrXmsrP03w" },
+  { n:34, flag:"🇶🇦", country:"Al Jazeera",  name:"AJ English — Live Stream",                    genre:"News",          type:"yt", id:"gCNeDWCI0vo" },
+
+  // ── 🇨🇳 CGTN Documentary (confirmed)
+  { n:35, flag:"🇨🇳", country:"China",       name:"CGTN — Unified Future",                        genre:"Documentary",   type:"yt", id:"q08uJRMh6MQ" },
+  { n:36, flag:"🇨🇳", country:"China",       name:"CGTN — China's Most Beautiful Village",        genre:"Culture",       type:"yt", id:"iOhlm8UVzjQ" },
+  { n:37, flag:"🇨🇳", country:"China",       name:"CGTN — Echoes of Life",                        genre:"Documentary",   type:"yt", id:"8B9MMDOC1z0" },
+  { n:38, flag:"🇨🇳", country:"China",       name:"CGTN — Taiwan: Savoring Nostalgia",            genre:"Culture",       type:"yt", id:"_uQBb1d9GAw" },
+  { n:39, flag:"🇨🇳", country:"China",       name:"CGTN — Industrial Chains",                     genre:"Documentary",   type:"yt", id:"kTabY9Zk7GQ" },
+
+  // ── 🌍 Kurzgesagt — science animation (confirmed)
+  { n:40, flag:"🌍", country:"Kurzgesagt",   name:"Kurzgesagt — Scariest Place in Universe",      genre:"Science",       type:"yt", id:"yDAAlojz8NU" },
+  { n:41, flag:"🌍", country:"Kurzgesagt",   name:"Kurzgesagt — Something Hiding Inside Earth",   genre:"Science",       type:"yt", id:"VD6xJq8NguY" },
+  { n:42, flag:"🌍", country:"Kurzgesagt",   name:"Kurzgesagt — Last Thing in the Universe",      genre:"Science",       type:"yt", id:"FgnjdW-x7mQ" },
+  { n:43, flag:"🌍", country:"Kurzgesagt",   name:"Kurzgesagt — True Limits of Humanity",         genre:"Science",       type:"yt", id:"uzkD5SeuwzM" },
+  { n:44, flag:"🌍", country:"Kurzgesagt",   name:"Kurzgesagt — Time: History & Future",          genre:"Science",       type:"yt", id:"5TbUxGZtwGI" },
+
+  // ── 🇺🇸 USA public domain — archive.org (confirmed direct MP4)
+  { n:45, flag:"🇺🇸", country:"USA (PD)",    name:"Dragnet — The Big Cast (1952)",                genre:"Crime",         type:"mp4", id:"https://archive.org/download/Dragnet_TheBigCast/Dragnet_TheBigCast.mp4",                                                                                                                page:"https://archive.org/details/Dragnet_TheBigCast" },
+  { n:46, flag:"🇺🇸", country:"USA (PD)",    name:"Robin Hood — The Coming (1955)",               genre:"Adventure",     type:"mp4", id:"https://archive.org/download/Robin_Hood_01_The_Coming_Of_Robin_Hood/Robin_Hood_01_The_Coming_Of_Robin_Hood.mp4",                                                                     page:"https://archive.org/details/Robin_Hood_01_The_Coming_Of_Robin_Hood" },
+  { n:47, flag:"🇺🇸", country:"USA (PD)",    name:"Lone Ranger — Enter (1949)",                   genre:"Western",       type:"mp4", id:"https://archive.org/download/enter_the_lone_ranger/enter_the_lone_ranger.mp4",                                                                                                       page:"https://archive.org/details/enter_the_lone_ranger" },
+  { n:48, flag:"🇺🇸", country:"USA (PD)",    name:"Peter Gunn — The Fuse (1959)",                 genre:"Detective",     type:"mp4", id:"https://archive.org/download/PeterGunn-TheFuse/PeterGunn-TheFuse.mp4",                                                                                                               page:"https://archive.org/details/PeterGunn-TheFuse" },
+
+  // ── 🇫🇷🇯🇵 Classic anime — archive.org (confirmed direct MP4)
+  { n:49, flag:"🇫🇷", country:"France/JP",   name:"Ulysses 31 — Restored",                        genre:"Classic Anime", type:"mp4", id:"https://archive.org/download/ulysses-31_complete_restored_series/Ulysses%2031%20Restored%20-%2040th%20Anniversary%20Announcement.mp4",                                             page:"https://archive.org/details/ulysses-31_complete_restored_series" },
+  { n:50, flag:"🇯🇵", country:"Japan",       name:"Astro Boy 1963 (English dub)",                 genre:"Classic Anime", type:"mp4", id:"https://archive.org/download/astro-boy-1963/astro-boy-1963.mp4",                                                                                                                   page:"https://archive.org/details/astro-boy-1963" },
+  { n:51, flag:"🇯🇵", country:"Japan",       name:"Maya the Bee (1975 English)",                  genre:"Classic Anime", type:"mp4", id:"https://archive.org/download/maya-the-bee-1975/Season%201%2FMaya%20the%20Bee%20-%20S01E01%20-%20Maya%20And%20The%20Ants.mp4",                                                     page:"https://archive.org/details/maya-the-bee-1975" },
+  { n:52, flag:"🇯🇵", country:"Japan",       name:"Speed Racer X — Ep 1",                         genre:"Classic Anime", type:"mp4", id:"https://archive.org/download/speed-racer-x-1-13/Speed%20Racer%20X%20Episode%201%20Race%20To%20The%20Start.mp4",                                                                   page:"https://archive.org/details/speed-racer-x-1-13" },
 ];
 
 let cur = -1;
