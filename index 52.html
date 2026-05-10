@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interdimensional Cable</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080810;
+    --surface: #0f0f1a;
+    --surface2: #14141f;
+    --border: #1e1e30;
+    --border-hi: #2a2a4a;
+    --accent: #4488ff;
+    --accent-dim: #1a2a4a;
+    --text: #c8c8e0;
+    --text-dim: #5a5a7a;
+    --text-bright: #e8e8ff;
+    --glow: rgba(68,136,255,0.2);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    height: 100vh; overflow: hidden;
+    display: flex; flex-direction: column;
+  }
+  body::after {
+    content: ''; position: fixed; inset: 0;
+    background: repeating-linear-gradient(0deg, rgba(0,0,30,0.05) 0px, rgba(0,0,30,0.05) 1px, transparent 1px, transparent 3px);
+    pointer-events: none; z-index: 9999;
+  }
+
+  header {
+    padding: 0.65rem 1.5rem; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; gap: 1rem; flex-shrink: 0;
+  }
+  h1 { font-family: 'Orbitron', monospace; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.2em; color: var(--accent); }
+  #sig { font-size: 10px; color: var(--text-dim); letter-spacing: 0.1em; }
+  #sdot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #3c3; margin-right: 5px; vertical-align: middle; animation: blink 2s ease-in-out infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
+
+  .layout { flex: 1; display: grid; grid-template-columns: 1fr 285px; min-height: 0; }
+
+  /* ── SCREEN ── */
+  #screen-col { display: flex; flex-direction: column; border-right: 1px solid var(--border); }
+  #screen-wrap { flex: 1; position: relative; background: #000; overflow: hidden; }
+
+  /* YT API injects its own iframe inside #yt-player-div */
+
+  /* Thumbnail / idle state */
+  #idle {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px;
+    background: #000; z-index: 5;
+    transition: opacity 0.3s;
+  }
+  #idle.hidden { opacity: 0; pointer-events: none; }
+  #thumb {
+    width: 100%; height: 100%; object-fit: cover; opacity: 0.4;
+    position: absolute; inset: 0; display: none;
+  }
+  #play-btn {
+    position: relative; z-index: 2;
+    width: 72px; height: 72px; border-radius: 50%;
+    background: rgba(68,136,255,0.85); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.15s, background 0.15s;
+    box-shadow: 0 0 30px var(--glow);
+  }
+  #play-btn:hover { transform: scale(1.08); background: rgba(68,136,255,1); }
+  #play-btn svg { width: 28px; height: 28px; fill: #fff; margin-left: 4px; }
+  #idle-title {
+    position: relative; z-index: 2;
+    font-size: 13px; color: var(--text); text-align: center;
+    max-width: 80%; line-height: 1.5; letter-spacing: 0.03em;
+  }
+  #idle-sub { position: relative; z-index: 2; font-size: 11px; color: var(--text-dim); }
+  #static-art {
+    position: relative; z-index: 2;
+    font-size: 11px; line-height: 1.4; color: #181828;
+    letter-spacing: 1px; text-align: center; user-select: none;
+  }
+  #static-lbl { position: relative; z-index: 2; font-family: 'Orbitron', monospace; font-size: 9px; letter-spacing: 0.3em; color: #222238; }
+
+  #ch-bug {
+    position: absolute; top: 10px; right: 12px;
+    font-family: 'Orbitron', monospace; font-size: 11px;
+    color: rgba(255,255,255,0.65); letter-spacing: 0.12em;
+    z-index: 20; opacity: 0; transition: opacity 0.3s; pointer-events: none;
+    text-shadow: 0 0 10px rgba(68,136,255,0.9);
+  }
+  #ch-bug.show { opacity: 1; }
+
+  #now-bar {
+    background: var(--surface); border-top: 1px solid var(--border);
+    padding: 7px 14px; display: flex; align-items: center; gap: 10px;
+    min-height: 42px; flex-shrink: 0;
+  }
+  #now-ch { font-family: 'Orbitron', monospace; font-size: 10px; color: var(--accent); letter-spacing: 0.1em; white-space: nowrap; }
+  #now-title { font-size: 12px; color: var(--text-bright); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #now-flag { font-size: 14px; flex-shrink: 0; }
+  #ext-link { font-size: 10px; color: var(--text-dim); text-decoration: none; white-space: nowrap; border: 1px solid var(--border); padding: 2px 7px; border-radius: 2px; transition: color 0.12s, border-color 0.12s; flex-shrink: 0; display: none; }
+  #ext-link:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ── RIGHT ── */
+  #right-col { display: flex; flex-direction: column; overflow: hidden; }
+  #remote { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 12px; display: flex; flex-direction: column; gap: 7px; flex-shrink: 0; }
+  .rl { font-size: 9px; letter-spacing: 0.22em; color: var(--text-dim); text-transform: uppercase; }
+  .brow { display: flex; gap: 6px; }
+  .rb { flex: 1; background: var(--surface2); color: var(--text); border: 1px solid var(--border); padding: 7px 4px; cursor: pointer; font-family: 'Share Tech Mono', monospace; font-size: 12px; border-radius: 3px; transition: all 0.12s; text-align: center; }
+  .rb:hover { background: var(--border); color: var(--text-bright); border-color: var(--border-hi); }
+  .rb.flip { background: var(--accent-dim); color: var(--accent); border-color: #2a3a6a; font-family: 'Orbitron', monospace; font-size: 10px; letter-spacing: 0.1em; }
+  .rb.flip:hover { background: #1f2f5a; border-color: var(--accent); box-shadow: 0 0 14px var(--glow); }
+
+  #frow { display: flex; gap: 4px; padding: 7px 10px; border-bottom: 1px solid var(--border); flex-shrink: 0; flex-wrap: wrap; }
+  .fb { background: var(--surface2); color: var(--text-dim); border: 1px solid var(--border); padding: 3px 7px; cursor: pointer; font-family: 'Share Tech Mono', monospace; font-size: 10px; border-radius: 2px; transition: all 0.12s; white-space: nowrap; }
+  .fb:hover { background: var(--border); color: var(--text); }
+  .fb.on { background: var(--accent-dim); color: var(--accent); border-color: #2a3a6a; }
+
+  #guide { flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+  #guide::-webkit-scrollbar { width: 3px; }
+  #guide::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  .ghdr { font-size: 9px; letter-spacing: 0.2em; color: var(--text-dim); padding: 7px 10px 5px; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+  .ci { display: flex; align-items: flex-start; gap: 8px; padding: 7px 10px; border-bottom: 1px solid rgba(255,255,255,0.025); cursor: pointer; transition: background 0.1s; }
+  .ci:hover { background: var(--surface); }
+  .ci.on { background: var(--accent-dim); }
+  .cn { font-family: 'Orbitron', monospace; font-size: 9px; color: var(--text-dim); min-width: 22px; padding-top: 2px; flex-shrink: 0; }
+  .ci.on .cn { color: var(--accent); }
+  .cinfo { flex: 1; min-width: 0; }
+  .cname { font-size: 11px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ci.on .cname { color: var(--text-bright); }
+  .cmeta { font-size: 10px; color: var(--text-dim); margin-top: 1px; }
+
+  @media (max-width: 660px) {
+    body { overflow: auto; height: auto; }
+    .layout { grid-template-columns: 1fr; }
+    #screen-col { border-right: none; border-bottom: 1px solid var(--border); }
+    #screen-wrap { padding-bottom: 56.25%; height: 0; flex: none; }
+    #yt-player-div, #idle { position: absolute; }
+    #right-col { max-height: 400px; }
+  }
+</style>
+<!-- YouTube IFrame API — needed for onStateChange (auto-advance on end) -->
+<script src="https://www.youtube.com/iframe_api"></script>
+</head>
+<body>
+<!-- file:// warning banner — hidden when served over http/https -->
+<div id="file-warn" style="display:none;background:#1a1000;border-bottom:1px solid #554400;padding:8px 16px;font-size:11px;color:#cc9900;letter-spacing:0.05em;line-height:1.6;">
+  ⚠ YouTube embeds require a web server. Open this file via <strong>http://</strong> not <strong>file://</strong>.<br>
+  Quick fix: <code style="background:#111;padding:1px 6px;border-radius:2px;">python -m http.server 8080</code> in this folder, then visit <a href="http://localhost:8080" style="color:#ffbb33;">http://localhost:8080</a> &nbsp;·&nbsp; Or deploy free to <a href="https://pages.github.com" target="_blank" style="color:#ffbb33;">GitHub Pages</a> — see README.md
+</div>
+
+<header>
+  <h1>Interdimensional Cable</h1>
+  <div id="sig"><span id="sdot"></span>WORLDWIDE BROADCAST</div>
+</header>
+<div class="layout">
+  <div id="screen-col">
+    <div id="screen-wrap">
+      <!-- YT API player div injected here dynamically -->
+      <div id="idle">
+        <img id="thumb" alt="">
+        <div id="static-art">▒▒▓▒▒▓▒▒▓▓▒▒▓▒▒▓<br>▓▒▒▓▒▒▒▒▒▒▓▓▒▒▒▒<br>▒▓▓▒▒▓▒▓▒▒▒▒▓▒▓▒<br>▒▒▓▒▒▓▒▒▓▓▒▒▓▒▒▓<br>▓▒▒▒▒▒▓▒▒▒▒▒▒▓▒▒</div>
+        <div id="static-lbl">NO SIGNAL — SELECT A CHANNEL</div>
+        <button id="play-btn" onclick="pressPlay()" style="display:none" aria-label="Play">
+          <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+        </button>
+        <div id="idle-title" style="display:none"></div>
+        <div id="idle-sub" style="display:none"></div>
+      </div>
+      <div id="ch-bug">CH <span id="ch-n">--</span></div>
+    </div>
+    <div id="now-bar">
+      <div id="now-ch">--</div>
+      <div id="now-title">No channel selected</div>
+      <div id="now-flag"></div>
+      <a id="ext-link" href="#" target="_blank">↗</a>
+    </div>
+  </div>
+
+  <div id="right-col">
+    <div id="remote">
+      <div class="rl">Remote</div>
+      <div class="brow"><button class="rb flip" onclick="flipRandom()">⚡ FLIP</button></div>
+      <div class="brow">
+        <button class="rb" onclick="go(-1)">◀ PREV</button>
+        <button class="rb" onclick="go(1)">NEXT ▶</button>
+      </div>
+    </div>
+    <div id="frow"></div>
+    <div id="guide">
+      <div class="ghdr">Channel Guide</div>
+      <div id="glist"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const channels = [
+
+  // ── 🇬🇧 BBC Earth — David Attenborough wildlife (official YouTube, confirmed)
+  { n:1,  flag:"🇬🇧", country:"BBC Earth",   name:"BBC Earth — Wild Side of Our Planet",          genre:"Wildlife",      type:"yt", id:"E5fofNAbm78" },
+  { n:2,  flag:"🇬🇧", country:"BBC Earth",   name:"BBC Earth — 2hrs Captivating Nature",          genre:"Wildlife",      type:"yt", id:"ZMnEWJARaUg" },
+  { n:3,  flag:"🇬🇧", country:"BBC Earth",   name:"BBC Earth — Breathtaking Moments",             genre:"Wildlife",      type:"yt", id:"jdZSMhBa4UM" },
+  { n:4,  flag:"🇬🇧", country:"BBC Earth",   name:"BBC Earth — 5hrs 4K Nature",                  genre:"Wildlife",      type:"yt", id:"No45YnGEwPI" },
+  { n:5,  flag:"🇬🇧", country:"BBC Earth",   name:"BBC Earth — Extraordinary Moments",            genre:"Wildlife",      type:"yt", id:"-E8XfkSAS8A" },
+
+  // ── 🇬🇧 Mr Bean — official comedy (confirmed)
+  { n:6,  flag:"🇬🇧", country:"UK",          name:"Mr Bean — Attention!",                         genre:"Comedy",        type:"yt", id:"ZJGAOmMdPz4" },
+  { n:7,  flag:"🇬🇧", country:"UK",          name:"Mr Bean — Back to School",                     genre:"Comedy",        type:"yt", id:"Fw_B5WYwFA0" },
+  { n:8,  flag:"🇬🇧", country:"UK",          name:"Mr Bean — Meets the Queen",                    genre:"Comedy",        type:"yt", id:"NoRv83zWIOQ" },
+
+  // ── 🇩🇪 DW Documentary (confirmed)
+  { n:9,  flag:"🇩🇪", country:"Germany",     name:"DW — Election Year America 2024",              genre:"Documentary",   type:"yt", id:"GZHsihSVGHM" },
+  { n:10, flag:"🇩🇪", country:"Germany",     name:"DW — World of the Superrich",                  genre:"Documentary",   type:"yt", id:"-4oB44W_2Tc" },
+  { n:11, flag:"🇩🇪", country:"Germany",     name:"DW — Swiss Mountain Communities",              genre:"Documentary",   type:"yt", id:"FwBZPhJrNec" },
+  { n:12, flag:"🇩🇪", country:"Germany",     name:"DW — By Train Through Thailand",               genre:"Travel",        type:"yt", id:"aaPt1LWGIB0" },
+  { n:13, flag:"🇩🇪", country:"Germany",     name:"DW — Secrets of Lightning",                    genre:"Science",       type:"yt", id:"1I9u5x4N6ME" },
+  { n:14, flag:"🇩🇪", country:"Germany",     name:"DW — Norway Flooded by Tourists",              genre:"Documentary",   type:"yt", id:"bsIUHHtEEOc" },
+  { n:15, flag:"🇩🇪", country:"Germany",     name:"DW — Albania's Mysterious North",              genre:"Travel",        type:"yt", id:"Ma85-ZxGL3U" },
+  { n:16, flag:"🇩🇪", country:"Germany",     name:"DW — Rise of Illiberal Europe",                genre:"Documentary",   type:"yt", id:"Aerq2UDhZJQ" },
+
+  // ── 🇯🇵 NHK World — Japan (confirmed)
+  { n:17, flag:"🇯🇵", country:"Japan",       name:"NHK — Fukushima Decommission 2024",            genre:"Documentary",   type:"yt", id:"M82bUV-RnSI" },
+  { n:18, flag:"🇯🇵", country:"Japan",       name:"NHK — Thatched Living",                        genre:"Documentary",   type:"yt", id:"WL7FilB3sLM" },
+  { n:19, flag:"🇯🇵", country:"Japan",       name:"NHK — Stateless: Japanese in Philippines",     genre:"Documentary",   type:"yt", id:"uG4JJU5UdGk" },
+  { n:20, flag:"🇯🇵", country:"Japan",       name:"NHK — Herbal Symphony",                        genre:"Culture",       type:"yt", id:"Qv2-IjYls0A" },
+  { n:21, flag:"🇯🇵", country:"Japan",       name:"NHK — Missing: Lost with Dementia",            genre:"Documentary",   type:"yt", id:"b0eBHFENGmM" },
+  { n:22, flag:"🇯🇵", country:"Japan",       name:"NHK — Journeys: Okinawa in Bloom",             genre:"Travel",        type:"yt", id:"B1P3XsXdYLQ" },
+  { n:23, flag:"🇯🇵", country:"Japan",       name:"NHK — Journeys: Yakushima Awakenings",         genre:"Travel",        type:"yt", id:"Qo7X9ATqa64" },
+  { n:24, flag:"🇯🇵", country:"Japan",       name:"NHK — Journeys: Wakayama Flavors",             genre:"Travel",        type:"yt", id:"VaGvz1FjcpU" },
+  { n:25, flag:"🇯🇵", country:"Japan",       name:"NHK — Journeys: Kumano Kodo Hiking",           genre:"Travel",        type:"yt", id:"-h8G_6ZY7Oc" },
+  { n:26, flag:"🇯🇵", country:"Japan",       name:"NHK — Diary of a Nun's Kitchen",               genre:"Culture",       type:"yt", id:"VN_hmi9gBgA" },
+
+  // ── 🇫🇷🇩🇪 ARTE.tv — European cultural channel (confirmed)
+  { n:27, flag:"🇫🇷", country:"ARTE",        name:"ARTE — Nice to Meet You: France",              genre:"Documentary",   type:"yt", id:"TKuAWJ7izu8" },
+  { n:28, flag:"🇫🇷", country:"ARTE",        name:"ARTE — Portugal: Small Country Big History",   genre:"History",       type:"yt", id:"VrNlZh_fxgA" },
+  { n:29, flag:"🇫🇷", country:"ARTE",        name:"ARTE — Putin: Feared, Hated, Admired?",        genre:"Documentary",   type:"yt", id:"NqB1xwhJHyw" },
+  { n:30, flag:"🇫🇷", country:"ARTE",        name:"ARTE — The Origin of Life",                    genre:"Science",       type:"yt", id:"DCAXlQQZXWs" },
+  { n:31, flag:"🇫🇷", country:"ARTE",        name:"ARTE — Ukraine: A Battle for History",         genre:"History",       type:"yt", id:"JN5puNjI_jE" },
+  { n:32, flag:"🇫🇷", country:"ARTE",        name:"ARTE — Do We Need Corruption?",                genre:"Society",       type:"yt", id:"aY6b2sQBRBA" },
+
+  // ── 🇶🇦 Al Jazeera (confirmed)
+  { n:33, flag:"🇶🇦", country:"Al Jazeera",  name:"AJ — Echoes of a Lost Gaza",                  genre:"Documentary",   type:"yt", id:"BrrXmsrP03w" },
+  { n:34, flag:"🇶🇦", country:"Al Jazeera",  name:"AJ English — Live Stream",                    genre:"News",          type:"yt", id:"gCNeDWCI0vo" },
+
+  // ── 🇨🇳 CGTN Documentary (confirmed)
+  { n:35, flag:"🇨🇳", country:"China",       name:"CGTN — Unified Future",                        genre:"Documentary",   type:"yt", id:"q08uJRMh6MQ" },
+  { n:36, flag:"🇨🇳", country:"China",       name:"CGTN — China's Most Beautiful Village",        genre:"Culture",       type:"yt", id:"iOhlm8UVzjQ" },
+  { n:37, flag:"🇨🇳", country:"China",       name:"CGTN — Echoes of Life",                        genre:"Documentary",   type:"yt", id:"8B9MMDOC1z0" },
+  { n:38, flag:"🇨🇳", country:"China",       name:"CGTN — Taiwan: Savoring Nostalgia",            genre:"Culture",       type:"yt", id:"_uQBb1d9GAw" },
+  { n:39, flag:"🇨🇳", country:"China",       name:"CGTN — Industrial Chains",                     genre:"Documentary",   type:"yt", id:"kTabY9Zk7GQ" },
+
+  // ── 🌍 Kurzgesagt — science animation (confirmed)
+  { n:40, flag:"🌍", country:"Kurzgesagt",   name:"Kurzgesagt — Scariest Place in Universe",      genre:"Science",       type:"yt", id:"yDAAlojz8NU" },
+  { n:41, flag:"🌍", country:"Kurzgesagt",   name:"Kurzgesagt — Something Hiding Inside Earth",   genre:"Science",       type:"yt", id:"VD6xJq8NguY" },
+  { n:42, flag:"🌍", country:"Kurzgesagt",   name:"Kurzgesagt — Last Thing in the Universe",      genre:"Science",       type:"yt", id:"FgnjdW-x7mQ" },
+  { n:43, flag:"🌍", country:"Kurzgesagt",   name:"Kurzgesagt — True Limits of Humanity",         genre:"Science",       type:"yt", id:"uzkD5SeuwzM" },
+  { n:44, flag:"🌍", country:"Kurzgesagt",   name:"Kurzgesagt — Time: History & Future",          genre:"Science",       type:"yt", id:"5TbUxGZtwGI" },
+
+  // ── 🇺🇸 USA public domain — archive.org (confirmed direct MP4)
+  { n:45, flag:"🇺🇸", country:"USA (PD)",    name:"Dragnet — The Big Cast (1952)",                genre:"Crime",         type:"mp4", id:"https://archive.org/download/Dragnet_TheBigCast/Dragnet_TheBigCast.mp4",                                                                                                                page:"https://archive.org/details/Dragnet_TheBigCast" },
+  { n:46, flag:"🇺🇸", country:"USA (PD)",    name:"Robin Hood — The Coming (1955)",               genre:"Adventure",     type:"mp4", id:"https://archive.org/download/Robin_Hood_01_The_Coming_Of_Robin_Hood/Robin_Hood_01_The_Coming_Of_Robin_Hood.mp4",                                                                     page:"https://archive.org/details/Robin_Hood_01_The_Coming_Of_Robin_Hood" },
+  { n:47, flag:"🇺🇸", country:"USA (PD)",    name:"Lone Ranger — Enter (1949)",                   genre:"Western",       type:"mp4", id:"https://archive.org/download/enter_the_lone_ranger/enter_the_lone_ranger.mp4",                                                                                                       page:"https://archive.org/details/enter_the_lone_ranger" },
+  { n:48, flag:"🇺🇸", country:"USA (PD)",    name:"Peter Gunn — The Fuse (1959)",                 genre:"Detective",     type:"mp4", id:"https://archive.org/download/PeterGunn-TheFuse/PeterGunn-TheFuse.mp4",                                                                                                               page:"https://archive.org/details/PeterGunn-TheFuse" },
+
+  // ── 🇫🇷🇯🇵 Classic anime — archive.org (confirmed direct MP4)
+  { n:49, flag:"🇫🇷", country:"France/JP",   name:"Ulysses 31 — Restored",                        genre:"Classic Anime", type:"mp4", id:"https://archive.org/download/ulysses-31_complete_restored_series/Ulysses%2031%20Restored%20-%2040th%20Anniversary%20Announcement.mp4",                                             page:"https://archive.org/details/ulysses-31_complete_restored_series" },
+  { n:50, flag:"🇯🇵", country:"Japan",       name:"Astro Boy 1963 (English dub)",                 genre:"Classic Anime", type:"mp4", id:"https://archive.org/download/astro-boy-1963/astro-boy-1963.mp4",                                                                                                                   page:"https://archive.org/details/astro-boy-1963" },
+  { n:51, flag:"🇯🇵", country:"Japan",       name:"Maya the Bee (1975 English)",                  genre:"Classic Anime", type:"mp4", id:"https://archive.org/download/maya-the-bee-1975/Season%201%2FMaya%20the%20Bee%20-%20S01E01%20-%20Maya%20And%20The%20Ants.mp4",                                                     page:"https://archive.org/details/maya-the-bee-1975" },
+  { n:52, flag:"🇯🇵", country:"Japan",       name:"Speed Racer X — Ep 1",                         genre:"Classic Anime", type:"mp4", id:"https://archive.org/download/speed-racer-x-1-13/Speed%20Racer%20X%20Episode%201%20Race%20To%20The%20Start.mp4",                                                                   page:"https://archive.org/details/speed-racer-x-1-13" },
+];
+
+let cur = -1;
+let filtered = [...channels];
+let bugTimer = null;
+
+function buildFilters() {
+  const countries = ["All", ...new Set(channels.map(c => c.country))];
+  document.getElementById('frow').innerHTML = countries.map((c, i) => {
+    const flag = i === 0 ? '' : (channels.find(ch => ch.country === c)?.flag + ' ');
+    return `<button class="fb${i===0?' on':''}" onclick="setFilter('${c}',this)">${flag}${c}</button>`;
+  }).join('');
+}
+
+function setFilter(c, btn) {
+  document.querySelectorAll('.fb').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  filtered = c === 'All' ? [...channels] : channels.filter(ch => ch.country === c);
+  cur = -1;
+  renderGuide();
+}
+
+function renderGuide() {
+  document.getElementById('glist').innerHTML = filtered.map((c, i) =>
+    `<div class="ci" id="gi${i}" onclick="tune(${i})">
+      <div class="cn">${String(c.n).padStart(2,'0')}</div>
+      <div class="cinfo">
+        <div class="cname">${c.flag} ${c.name}</div>
+        <div class="cmeta">${c.country} · ${c.genre}</div>
+      </div>
+    </div>`
+  ).join('');
+}
+
+// YouTube IFrame API
+let ytPlayer = null;
+
+function onYouTubeIframeAPIReady() {}
+
+function tune(idx) {
+  const c = filtered[idx];
+  if (!c) return;
+  cur = idx;
+
+  // highlight guide item
+  document.querySelectorAll('.ci').forEach(el => el.classList.remove('on'));
+  const item = document.getElementById('gi' + idx);
+  if (item) { item.classList.add('on'); item.scrollIntoView({ behavior:'smooth', block:'nearest' }); }
+
+  // hide idle screen
+  document.getElementById('idle').classList.add('hidden');
+
+  // tear down previous archive video
+  const oldVid = document.getElementById('arch-vid');
+  if (oldVid) oldVid.remove();
+
+  // tear down previous YT player
+  if (ytPlayer) {
+    try { ytPlayer.destroy(); } catch(e) {}
+    ytPlayer = null;
+  }
+  const frame = document.getElementById('player-frame');
+  if (frame) { frame.style.display = 'none'; frame.src = 'about:blank'; }
+
+  if (c.type === 'yt') {
+    // Always recreate the div fresh (YT API replaces it)
+    let ytDiv = document.getElementById('yt-player-div');
+    if (ytDiv) ytDiv.remove();
+    ytDiv = document.createElement('div');
+    ytDiv.id = 'yt-player-div';
+    ytDiv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;z-index:3;';
+    document.getElementById('screen-wrap').appendChild(ytDiv);
+
+    ytPlayer = new YT.Player('yt-player-div', {
+      videoId: c.id,
+      playerVars: {
+        autoplay: 1,
+        rel: 0,
+        modestbranding: 1,
+        loop: 1,
+        playlist: c.id  // loop=1 requires playlist set to same video ID
+      },
+      events: {
+        onReady: (e) => {
+          // Seek to a random point in the first 85% of the video
+          const dur = e.target.getDuration();
+          if (dur > 0) {
+            e.target.seekTo(Math.floor(Math.random() * dur * 0.85), true);
+          }
+        }
+      }
+    });
+
+  } else {
+    // archive.org MP4 — loop natively, drop in at random point
+    const vid = document.createElement('video');
+    vid.id = 'arch-vid';
+    vid.controls = true;
+    vid.playsInline = true;
+    vid.autoplay = true;
+    vid.loop = true;
+    vid.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;background:#000;object-fit:contain;z-index:3;';
+
+    vid.addEventListener('loadedmetadata', () => {
+      if (vid.duration > 0) {
+        vid.currentTime = Math.random() * vid.duration * 0.85;
+      }
+    });
+
+    document.getElementById('screen-wrap').appendChild(vid);
+    vid.src = c.id;
+    vid.load();
+    vid.play().catch(() => {});
+  }
+
+  // channel bug overlay
+  document.getElementById('ch-n').textContent = c.n;
+  const bug = document.getElementById('ch-bug');
+  bug.classList.add('show');
+  clearTimeout(bugTimer);
+  bugTimer = setTimeout(() => bug.classList.remove('show'), 3000);
+
+  // now bar
+  document.getElementById('now-ch').textContent = `CH ${String(c.n).padStart(2,'0')}`;
+  document.getElementById('now-title').textContent = c.name;
+  document.getElementById('now-flag').textContent = c.flag;
+  const link = document.getElementById('ext-link');
+  link.href = c.type === 'yt' ? `https://www.youtube.com/watch?v=${c.id}` : c.page;
+  link.textContent = c.type === 'yt' ? '↗ YouTube' : '↗ archive.org';
+  link.style.display = 'inline';
+}
+
+function flipRandom() {
+  if (!filtered.length) return;
+  let next;
+  do { next = Math.floor(Math.random() * filtered.length); } while (next === cur && filtered.length > 1);
+  tune(next);
+}
+
+function go(dir) {
+  if (!filtered.length) return;
+  if (cur < 0) { tune(0); return; }
+  tune((cur + dir + filtered.length) % filtered.length);
+}
+
+buildFilters();
+renderGuide();
+
+if (location.protocol === 'file:') {
+  document.getElementById('file-warn').style.display = 'block';
+}
+</script>
+</body>
+</html>
